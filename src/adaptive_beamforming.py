@@ -87,7 +87,7 @@ def run(algorithm='BeamformerBase', inputfile_path="../signal_audio/wall1.wav"):
 
     for block in gen:
         pt1 = time.thread_time()
-        
+
         global i
         tempData = block
         tempTS = ac.TimeSamples(data=tempData, sample_freq=samplerate)
@@ -148,6 +148,9 @@ def run(algorithm='BeamformerBase', inputfile_path="../signal_audio/wall1.wav"):
     t2 = time.thread_time()
     print("First stage (low res) time: ", pt, 's')
     print("Second stage (high res) time: ", t2 - t1, 's')
+
+    with open(Path("../results/bf_time") / "times.log", "a") as f:
+        f.write(f"{inputfile.stem},{algorithm},{pt},{t2 - t1}\n")
     
     points = np.array([ p[1] for p in frames ])
     focus_points = np.array([ p[3] for p in frames ])

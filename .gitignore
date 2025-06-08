@@ -1,2 +1,10 @@
 __pycache__/
 .idea/
+
+signal_audio/*
+signal_video/*
+results/maps/*
+
+!signal_audio/
+!signal_video/
+!results/maps/
