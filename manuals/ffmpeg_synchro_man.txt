@@ -1,0 +1,11 @@
+# spr dlugosci nagrania audio / wideo
+ffprobe -i <plik> -show_entries format=duration -v quiet -of csv="p=0"
+
+# przycinanie wideo
+ffmpeg -i <plik> -ss <offset sek> -t <dlugosc nagrania sek> -c:v libx264 -c:a aac <plik doc>
+
+# przycinanie audio
+ffmpeg -ss <offset sek> -t <dlugosc nagrania sek> -i <plik> -c:a copy <plik doc>
+
+# wyciagniecie audio z nagrania wideo
+ffmpeg -i <plik mp4> -map 0:a -ac 1 <plik docelowy wav>
