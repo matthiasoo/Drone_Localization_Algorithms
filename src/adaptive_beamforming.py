@@ -84,6 +84,8 @@ def run(algorithm='BeamformerBase', inputfile_path="../signal_audio/wall1.wav"):
     t1 = time.thread_time()
     pt = 0
     frames = list()
+    total_frame_time = 0
+    frame_count = 0
 
     for block in gen:
         pt1 = time.thread_time()
@@ -137,6 +139,10 @@ def run(algorithm='BeamformerBase', inputfile_path="../signal_audio/wall1.wav"):
         fp = np.unravel_index(np.argmax(fr), fr.shape)
         fpx = mapIndexToRange(fp[0], fr.shape[0], frg.extend()[0], frg.extend()[1])
         fpy = mapIndexToRange(fp[1], fr.shape[1], frg.extend()[2], frg.extend()[3])
+
+        frame_time = time.thread_time() - pt1
+        total_frame_time += frame_time
+        frame_count += 1
         
         print(f"\rBF: {i}", end="", flush=True)
         i += 1
@@ -146,11 +152,17 @@ def run(algorithm='BeamformerBase', inputfile_path="../signal_audio/wall1.wav"):
     print()
     
     t2 = time.thread_time()
+    avg_frame_time = total_frame_time / frame_count if frame_count > 0 else 0
+
+    print("First stage (low res) time: ", pt, 's')
+    print("Second stage (high res) time: ", t2 - t1, 's')
+    print("Total frame time: ", total_frame_time, 's')
+    print("Average frame time: ", avg_frame_time, 's')
     print("First stage (low res) time: ", pt, 's')
     print("Second stage (high res) time: ", t2 - t1, 's')
 
     with open(Path("../results/bf_time") / "times.log", "a") as f:
-        f.write(f"{inputfile.stem},{algorithm},{pt},{t2 - t1}\n")
+        f.write(f"{inputfile.stem},{algorithm},{pt},{t2 - t1},{total_frame_time},{avg_frame_time}\n")
     
     points = np.array([ p[1] for p in frames ])
     focus_points = np.array([ p[3] for p in frames ])
@@ -161,6 +173,7 @@ def run(algorithm='BeamformerBase', inputfile_path="../signal_audio/wall1.wav"):
     ani = animation.FuncAnimation(fig, update, frames=frames, init_func=init, repeat=True, interval=1 / FPS)
     ani.save(f"../results/maps/{inputfile.stem}_{algorithm}_map.mp4", writer="ffmpeg", fps=FPS)
     plt.close()
+    i = 0
 
 if __name__ == '__main__':
     algorithms = ['BeamformerBase', 'BeamformerFunctional', 'BeamformerMusic', 'BeamformerCapon']
