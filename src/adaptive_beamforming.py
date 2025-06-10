@@ -86,6 +86,8 @@ def run(algorithm='BeamformerBase', inputfile_path="../signal_audio/wall1.wav"):
     frames = list()
     total_frame_time = 0
     frame_count = 0
+    min_frame_time = float('inf')
+    max_frame_time = float('-inf')
 
     for block in gen:
         pt1 = time.thread_time()
@@ -143,6 +145,8 @@ def run(algorithm='BeamformerBase', inputfile_path="../signal_audio/wall1.wav"):
         frame_time = time.thread_time() - pt1
         total_frame_time += frame_time
         frame_count += 1
+        min_frame_time = min(min_frame_time, frame_time)
+        max_frame_time = max(max_frame_time, frame_time)
         
         print(f"\rBF: {i}", end="", flush=True)
         i += 1
@@ -158,11 +162,11 @@ def run(algorithm='BeamformerBase', inputfile_path="../signal_audio/wall1.wav"):
     print("Second stage (high res) time: ", t2 - t1, 's')
     print("Total frame time: ", total_frame_time, 's')
     print("Average frame time: ", avg_frame_time, 's')
-    print("First stage (low res) time: ", pt, 's')
-    print("Second stage (high res) time: ", t2 - t1, 's')
+    print("Max frame time: ", max_frame_time, 's')
+    print("Min frame time: ", min_frame_time, 's')
 
     with open(Path("../results/bf_time") / "times.log", "a") as f:
-        f.write(f"{inputfile.stem},{algorithm},{pt},{t2 - t1},{total_frame_time},{avg_frame_time}\n")
+        f.write(f"{inputfile.stem},{algorithm},{pt},{t2 - t1},{total_frame_time},{avg_frame_time},{max_frame_time},{min_frame_time}\n")
     
     points = np.array([ p[1] for p in frames ])
     focus_points = np.array([ p[3] for p in frames ])
