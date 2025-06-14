@@ -85,12 +85,12 @@ def run(algorithm='BeamformerBase', inputfile_path="../signal_audio/wall1.wav"):
     pt = 0
     frames = list()
     total_frame_time = 0
-    frame_count = 0
-    min_frame_time = float('inf')
-    max_frame_time = float('-inf')
+    min_frame_time = 0
+    max_frame_time = 0
 
     for block in gen:
         pt1 = time.thread_time()
+        perf_counter_start = time.perf_counter()
 
         global i
         tempData = block
@@ -135,6 +135,8 @@ def run(algorithm='BeamformerBase', inputfile_path="../signal_audio/wall1.wav"):
             bf = ac.BeamformerMusic(freq_data=ps, steer=fst)
         elif algorithm == 'BeamformerCapon':
             bf = ac.BeamformerCapon(freq_data=ps, steer=fst)
+        else:
+            raise ValueError(f"Unknown algorithm: {algorithm}")
 
         tempFRes = np.sum(bf.result[8:16], 0)
         fr = tempFRes.reshape(frg.shape)
@@ -142,21 +144,21 @@ def run(algorithm='BeamformerBase', inputfile_path="../signal_audio/wall1.wav"):
         fpx = mapIndexToRange(fp[0], fr.shape[0], frg.extend()[0], frg.extend()[1])
         fpy = mapIndexToRange(fp[1], fr.shape[1], frg.extend()[2], frg.extend()[3])
 
-        frame_time = time.thread_time() - pt1
-        total_frame_time += frame_time
-        frame_count += 1
-        min_frame_time = min(min_frame_time, frame_time)
-        max_frame_time = max(max_frame_time, frame_time)
-        
+        frames.append((r, (px, py), fr, (fpx, fpy)))
+        perf_counter_stop = time.perf_counter() - perf_counter_start
+        total_frame_time += perf_counter_stop
+        max_frame_time = max(max_frame_time, perf_counter_stop)
+        if (i == 0):
+            min_frame_time = perf_counter_stop
+        min_frame_time = min(min_frame_time, perf_counter_stop)
         print(f"\rBF: {i}", end="", flush=True)
         i += 1
-        frames.append((r, (px, py), fr, (fpx, fpy)))
-    
-    i = 0
+
     print()
     
     t2 = time.thread_time()
-    avg_frame_time = total_frame_time / frame_count if frame_count > 0 else 0
+
+    avg_frame_time = total_frame_time / i
 
     print("First stage (low res) time: ", pt, 's')
     print("Second stage (high res) time: ", t2 - t1, 's')
@@ -164,6 +166,8 @@ def run(algorithm='BeamformerBase', inputfile_path="../signal_audio/wall1.wav"):
     print("Average frame time: ", avg_frame_time, 's')
     print("Max frame time: ", max_frame_time, 's')
     print("Min frame time: ", min_frame_time, 's')
+
+    i = 0
 
     with open(Path("../results/bf_time") / "times.log", "a") as f:
         f.write(f"{inputfile.stem},{algorithm},{pt},{t2 - t1},{total_frame_time},{avg_frame_time},{max_frame_time},{min_frame_time}\n")
