@@ -99,14 +99,11 @@ for rec in recordings:
 
         # Oblicz macierz przekształcenia za pomocą RANSAC, jeśli nie istnieje
         matrix_file = Path(f"../results/affine/{rec}_affine_matrix.npy")
-        if matrix_file.exists():
-            print(f"Loaded existing matrix for {rec}")
-            matrix = np.load(matrix_file)
-        else:
-            print(f"Calculating affine transformation matrix for {rec} using RANSAC")
-            matrix = ransac_affine(src_points, dst_points, max_trials=1000, residual_threshold=5.0)
-            np.save(matrix_file, matrix)
-            print(f"Matrix saved to {matrix_file}")
+
+        print(f"Calculating affine transformation matrix for {rec} using RANSAC")
+        matrix = ransac_affine(src_points, dst_points, max_trials=1000, residual_threshold=5.0)
+        np.save(matrix_file, matrix)
+        print(f"Matrix saved to {matrix_file}")
 
         linear_part, affine_part = separate_linear_affine(matrix)
 
@@ -160,7 +157,7 @@ for rec in recordings:
         ax.legend()
         ax.grid()
         plt.title(f"Error Distribution - {rec} with {algo}")
-        plt.savefig(Path("../results/plots/ransac") / f"{rec}_{algo}_error_dist.svg", format='svg')
+        plt.savefig(f"../results/plots/ransac/error/{rec}_{algo}_error_dist.svg", format='svg')
         plt.close()
 
         # Wykres porównawczy
@@ -175,5 +172,5 @@ for rec in recordings:
         ax.set_aspect("equal")
         ax.legend()
         plt.title(f"{rec} - {algo}")
-        plt.savefig(f"../results/plots/ransac/{rec}_{algo}_comparison.svg", format='svg')
+        plt.savefig(f"../results/plots/ransac/cmp/{rec}_{algo}_comparison.svg", format='svg')
         plt.close()

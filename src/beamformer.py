@@ -22,7 +22,7 @@ def run(algorithm='BeamformerBase', inputfile_path="../signal_audio/wall1.wav"):
     samplerate, wavData = wavfile.read(inputfile)
     ts = ac.TimeSamples(data=wavData, sample_freq=samplerate)
     
-    mg = ac.MicGeom(from_file=micgeofile)
+    mg = ac.MicGeom(file=micgeofile)
     rg = ac.RectGrid(
         x_min=-2,
         x_max=+2,
@@ -35,7 +35,7 @@ def run(algorithm='BeamformerBase', inputfile_path="../signal_audio/wall1.wav"):
     
     frg_span = 0.2
     FPS = 30
-    frames_count = int(ts.numsamples / ts.sample_freq * FPS)
+    frames_count = int(ts.num_samples / ts.sample_freq * FPS)
     frame_length = int(ts.sample_freq / FPS)
     print("Frames to be generated: ", frames_count)
     
@@ -128,15 +128,15 @@ def run(algorithm='BeamformerBase', inputfile_path="../signal_audio/wall1.wav"):
         fst = ac.SteeringVector(grid=frg, mics=mg, steer_type='classic')
 
         if algorithm == 'BeamformerBase':
-            fbb = ac.BeamformerBase(freq_data=ps, steer=fst)
+            bf = ac.BeamformerBase(freq_data=ps, steer=fst)
         elif algorithm == 'BeamformerFunctional':
-            fbb = ac.BeamformerFunctional(freq_data=ps, steer=fst)
+            bf = ac.BeamformerFunctional(freq_data=ps, steer=fst)
         elif algorithm == 'BeamformerMusic':
-            fbb = ac.BeamformerMusic(freq_data=ps, steer=fst)
+            bf = ac.BeamformerMusic(freq_data=ps, steer=fst)
         elif algorithm == 'BeamformerCapon':
-            fbb = ac.BeamformerCapon(freq_data=ps, steer=fst)
+            bf = ac.BeamformerCapon(freq_data=ps, steer=fst)
 
-        tempFRes = np.sum(fbb.result[8:16], 0)
+        tempFRes = np.sum(bf.result[8:16], 0)
         fr = tempFRes.reshape(frg.shape)
         fp = np.unravel_index(np.argmax(fr), fr.shape)
         fpx = mapIndexToRange(fp[0], fr.shape[0], frg.extend()[0], frg.extend()[1])

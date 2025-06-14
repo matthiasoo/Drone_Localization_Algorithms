@@ -26,7 +26,7 @@ for algo in algorithms:
     ax.yaxis.set_major_formatter(mtick.PercentFormatter(xmax=1))
     ax.grid()
     ax.legend(loc='lower right')
-    plt.savefig(Path("../results/plots/ced") / f"ced_{algo}.svg", format='svg')
+    plt.savefig(f"../results/plots/ced/{algo}_ced.svg", format='svg')
     plt.close()
 
 # Porównanie wszystkich algorytmów dla jednego nagrania
@@ -47,7 +47,7 @@ ax.set_xlabel("Distance [px]")
 ax.yaxis.set_major_formatter(mtick.PercentFormatter(xmax=1))
 ax.grid()
 ax.legend(loc='lower right')
-plt.savefig(Path("../results/plots/ced") / "ced_all_wall1.svg", format='svg')
+plt.savefig("../results/plots/ced/wall1_ced_all_.svg", format='svg')
 plt.close()
 
 #wall2
@@ -67,7 +67,7 @@ ax.set_xlabel("Distance [px]")
 ax.yaxis.set_major_formatter(mtick.PercentFormatter(xmax=1))
 ax.grid()
 ax.legend(loc='lower right')
-plt.savefig(Path("../results/plots/ced") / "ced_all_wall2.svg", format='svg')
+plt.savefig("../results/plots/ced/wall2_ced_all_.svg", format='svg')
 plt.close()
 
 #wall3
@@ -87,5 +87,5 @@ ax.set_xlabel("Distance [px]")
 ax.yaxis.set_major_formatter(mtick.PercentFormatter(xmax=1))
 ax.grid()
 ax.legend(loc='lower right')
-plt.savefig(Path("../results/plots/ced") / "ced_all_wall3.svg", format='svg')
+plt.savefig("../results/plots/ced/wall3_ced_all_.svg", format='svg')
 plt.close()
