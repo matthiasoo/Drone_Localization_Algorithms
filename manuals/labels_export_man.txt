@@ -14,9 +14,9 @@ y_center = NaN(totalFrames, 1);
 
 % Iteruj przez wszystkie klatki
 for i = 1:totalFrames
-    if ~isempty(droneData.Position{i})
+    if ~isempty(droneData.Pos{i})
         % Jeśli Position nie jest puste, oblicz współrzędne środka
-        coords = droneData.Position{i};
+        coords = droneData.Pos{i};
         x_center(i) = coords(1) + coords(3) / 2; % x lewego górnego + połowa szerokości
         y_center(i) = coords(2) + coords(4) / 2; % y lewego górnego + połowa wysokości
     end
@@ -33,7 +33,7 @@ timeSeconds = seconds(droneData.Time - droneData.Time(1));
 
 % Utwórz tabelę
 newTable = table(frameNumbers, timeSeconds, x_center, y_center, ...
-    'VariableNames', {'klatka', 'czas', 'x_środka', 'y_środka'});
+    'VariableNames', {'frame', 'time', 'x', 'y'});
 
 
 writetable(newTable, 'wall_1_labels.csv');

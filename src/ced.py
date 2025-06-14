@@ -26,7 +26,7 @@ for algo in algorithms:
     ax.yaxis.set_major_formatter(mtick.PercentFormatter(xmax=1))
     ax.grid()
     ax.legend(loc='lower right')
-    plt.savefig(Path("../results/plots") / f"ced_{algo}.svg", format='svg')
+    plt.savefig(Path("../results/plots/ced") / f"ced_{algo}.svg", format='svg')
     plt.close()
 
 # Porównanie wszystkich algorytmów dla jednego nagrania
@@ -38,7 +38,7 @@ for algo in algorithms:
     try:
         dist = np.load(dist_file)
     except FileNotFoundError:
-        print(f"Plik {dist_file} nie istnieje. Pomijam {algo}.")
+        print(f"File {dist_file} does not exist. Skipping {algo}.")
         continue
     hist, bins = np.histogram(dist, bins=100, range=(0, 100))
     ax.plot(bins[:-1], hist.cumsum() / hist.sum(), label=algo)
@@ -47,7 +47,7 @@ ax.set_xlabel("Distance [px]")
 ax.yaxis.set_major_formatter(mtick.PercentFormatter(xmax=1))
 ax.grid()
 ax.legend(loc='lower right')
-plt.savefig(Path("../results/plots") / "ced_all_wall1.svg", format='svg')
+plt.savefig(Path("../results/plots/ced") / "ced_all_wall1.svg", format='svg')
 plt.close()
 
 #wall2
@@ -58,7 +58,7 @@ for algo in algorithms:
     try:
         dist = np.load(dist_file)
     except FileNotFoundError:
-        print(f"Plik {dist_file} nie istnieje. Pomijam {algo}.")
+        print(f"File {dist_file} does not exist. Skipping {algo}.")
         continue
     hist, bins = np.histogram(dist, bins=100, range=(0, 100))
     ax.plot(bins[:-1], hist.cumsum() / hist.sum(), label=algo)
@@ -67,7 +67,7 @@ ax.set_xlabel("Distance [px]")
 ax.yaxis.set_major_formatter(mtick.PercentFormatter(xmax=1))
 ax.grid()
 ax.legend(loc='lower right')
-plt.savefig(Path("../results/plots") / "ced_all_wall2.svg", format='svg')
+plt.savefig(Path("../results/plots/ced") / "ced_all_wall2.svg", format='svg')
 plt.close()
 
 #wall3
@@ -78,7 +78,7 @@ for algo in algorithms:
     try:
         dist = np.load(dist_file)
     except FileNotFoundError:
-        print(f"Plik {dist_file} nie istnieje. Pomijam {algo}.")
+        print(f"File {dist_file} does not exist. Skipping {algo}.")
         continue
     hist, bins = np.histogram(dist, bins=100, range=(0, 100))
     ax.plot(bins[:-1], hist.cumsum() / hist.sum(), label=algo)
@@ -87,5 +87,5 @@ ax.set_xlabel("Distance [px]")
 ax.yaxis.set_major_formatter(mtick.PercentFormatter(xmax=1))
 ax.grid()
 ax.legend(loc='lower right')
-plt.savefig(Path("../results/plots") / "ced_all_wall3.svg", format='svg')
+plt.savefig(Path("../results/plots/ced") / "ced_all_wall3.svg", format='svg')
 plt.close()

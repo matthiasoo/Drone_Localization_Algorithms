@@ -13,6 +13,9 @@ scale = 550
 range_filter = True
 outlier_filter = True
 
+with open(Path("../results/dist/dist.log"), "w") as f:
+    f.write("")
+
 def affine_transformation_matrix(src_points, dst_points):
     # Ensure the points are in the correct shape
     assert src_points.shape == dst_points.shape
@@ -20,10 +23,10 @@ def affine_transformation_matrix(src_points, dst_points):
 
     # Add a column of ones to the source points for the affine transformation
     src_points_h = np.hstack([src_points, np.ones((n, 1))])
-    
+
     # Solve the least squares problem to find the transformation matrix
     transformation_matrix, _, _, _ = np.linalg.lstsq(src_points_h, dst_points, rcond=None)
-    
+
     return transformation_matrix.T # Transpose the result for correct indexing
 
 def separate_linear_affine(matrix):
@@ -65,34 +68,45 @@ def ransac_affine(src_pts, dst_pts, max_trials=1000, residual_threshold=1.0):
 
 
 for rec in recordings:
-    trajectory_file = Path(f"../points_lab/{rec}_traj.npy")
+    trajectory_file = Path(f"../points_lab/avg/{rec}_traj.npy")
     trajectory = np.load(trajectory_file)
 
+    print(f"\n{rec} shape: {trajectory.shape}")
+
+    trajectory_indices = np.array([i for i, el in enumerate(trajectory) if not np.all(np.isnan(el))])
+    trajectory = trajectory[trajectory_indices]
+
     for algo in algorithms:
-        print(f"\nPrzetwarzanie {rec} z algorytmem {algo}")
+        print(f"\nProcessing {rec} with {algo}")
         focuspoints_file = Path(f"../points_bf/{rec}_{algo}_focuspoints.npy")
         focuspoints = np.load(focuspoints_file)
+        print(focuspoints.shape)
+        focuspoints = focuspoints[trajectory_indices]
 
         fp_size = focuspoints.shape[0]
         tr_size = trajectory.shape[0]
+
         last_index = min(fp_size, tr_size)
 
         src_points = focuspoints[:last_index]
         dst_points = trajectory[:last_index]
 
-        print("Punkty źródłowe zawierają NaN: ", np.isnan(src_points).any())
-        print("Punkty docelowe zawierają NaN: ", np.isnan(dst_points).any())
+        print(f"Focuspoints shape: {focuspoints.shape}")
+        print(f"Trajectory shape: {trajectory.shape}")
+
+        print("Source points contain NaN: ", np.isnan(src_points).any())
+        print("Destination points contain NaN: ", np.isnan(dst_points).any())
 
         # Oblicz macierz przekształcenia za pomocą RANSAC, jeśli nie istnieje
         matrix_file = Path(f"../results/affine/{rec}_affine_matrix.npy")
         if matrix_file.exists():
-            print(f"Wczytano istniejącą macierz dla {rec}")
+            print(f"Loaded existing matrix for {rec}")
             matrix = np.load(matrix_file)
         else:
-            print(f"Obliczanie macierzy przekształcenia dla {rec} z RANSAC")
+            print(f"Calculating affine transformation matrix for {rec} using RANSAC")
             matrix = ransac_affine(src_points, dst_points, max_trials=1000, residual_threshold=5.0)
             np.save(matrix_file, matrix)
-            print(f"Zapisano macierz do {matrix_file}")
+            print(f"Matrix saved to {matrix_file}")
 
         linear_part, affine_part = separate_linear_affine(matrix)
 
@@ -123,10 +137,31 @@ for rec in recordings:
         np.save(f"../results/dist/{rec}_{algo}_dist_focuspoints.npy", dist)
 
         # Wyświetl statystyki
-        print("Average distance: ", np.average(dist))
-        print("Median distance: ", np.median(dist))
-        print("Standard deviation: ", np.std(dist))
-        print("RMSE: ", np.sqrt(np.mean(dist * dist)))
+        avg_dist = np.average(dist)
+        med_dist = np.median(dist)
+        std_dist = np.std(dist)
+        rmse = np.sqrt(np.mean(dist * dist))
+
+        print("Average distance: ", avg_dist)
+        print("Median distance: ", med_dist)
+        print("Standard deviation: ", std_dist)
+        print("RMSE: ", rmse)
+
+        with open(Path("../results/dist/dist.log"), "a") as f:
+            f.write(f"{rec},{algo},{avg_dist},{med_dist},{std_dist},{rmse}\n")
+
+        fix, ax = plt.subplots()
+        x = np.arange(len(dist))
+        ax.stem(x, dist, markerfmt='', label='Distance')
+        ax.stem(x, np.abs(np.ediff1d(dist, to_begin=0)), markerfmt='', linefmt='C1-', label='Distance Difference')
+        ax.set_ylim(0, 100)
+        ax.set_xlabel("Sample Index")
+        ax.set_ylabel("Distance [px]")
+        ax.legend()
+        ax.grid()
+        plt.title(f"Error Distribution - {rec} with {algo}")
+        plt.savefig(Path("../results/plots/ransac") / f"{rec}_{algo}_error_dist.svg", format='svg')
+        plt.close()
 
         # Wykres porównawczy
         fig, ax = plt.subplots()
@@ -140,5 +175,5 @@ for rec in recordings:
         ax.set_aspect("equal")
         ax.legend()
         plt.title(f"{rec} - {algo}")
-        plt.savefig(f"../results/plots/{rec}_{algo}_comparison.png")
+        plt.savefig(f"../results/plots/ransac/{rec}_{algo}_comparison.svg", format='svg')
         plt.close()
