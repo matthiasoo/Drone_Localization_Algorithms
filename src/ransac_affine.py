@@ -172,5 +172,5 @@ for rec in recordings:
         ax.set_aspect("equal")
         ax.legend()
         plt.title(f"{rec} - {algo}")
-        plt.savefig(f"../results/plots/ransac/cmp/{rec}_{algo}_comparison.svg", format='svg')
+        plt.savefig(f"../results/plots/ransac/traj/{rec}_{algo}_traj.svg", format='svg')
         plt.close()
