@@ -88,6 +88,8 @@ def run(algorithm='BeamformerBase', inputfile_path="../signal_audio/wall1.wav"):
     min_frame_time = 0
     max_frame_time = 0
 
+    fbf_gamma = 20
+
     for block in gen:
         pt1 = time.thread_time()
         perf_counter_start = time.perf_counter()
@@ -100,7 +102,7 @@ def run(algorithm='BeamformerBase', inputfile_path="../signal_audio/wall1.wav"):
         if algorithm == 'BeamformerBase':
             bb = ac.BeamformerBase(freq_data=ps, steer=st)
         elif algorithm == 'BeamformerFunctional':
-            bb = ac.BeamformerFunctional(freq_data=ps, steer=st)
+            bb = ac.BeamformerFunctional(freq_data=ps, steer=st, gamma=fbf_gamma)
         elif algorithm == 'BeamformerMusic':
             bb = ac.BeamformerMusic(freq_data=ps, steer=st)
         elif algorithm == 'BeamformerCapon':
@@ -130,7 +132,7 @@ def run(algorithm='BeamformerBase', inputfile_path="../signal_audio/wall1.wav"):
         if algorithm == 'BeamformerBase':
             bf = ac.BeamformerBase(freq_data=ps, steer=fst)
         elif algorithm == 'BeamformerFunctional':
-            bf = ac.BeamformerFunctional(freq_data=ps, steer=fst)
+            bf = ac.BeamformerFunctional(freq_data=ps, steer=fst, gamma=fbf_gamma)
         elif algorithm == 'BeamformerMusic':
             bf = ac.BeamformerMusic(freq_data=ps, steer=fst)
         elif algorithm == 'BeamformerCapon':
@@ -169,7 +171,7 @@ def run(algorithm='BeamformerBase', inputfile_path="../signal_audio/wall1.wav"):
 
     i = 0
 
-    with open(Path("../results/bf_time") / "times.log", "a") as f:
+    with open(Path("../results/bf_time") / "times.log", "w") as f:
         f.write(f"{inputfile.stem},{algorithm},{pt},{t2 - t1},{total_frame_time},{avg_frame_time},{max_frame_time},{min_frame_time}\n")
     
     points = np.array([ p[1] for p in frames ])
@@ -178,13 +180,18 @@ def run(algorithm='BeamformerBase', inputfile_path="../signal_audio/wall1.wav"):
     np.save(f"../points_bf/{inputfile.stem}_{algorithm}_points.npy", points)
     np.save(f"../points_bf/{inputfile.stem}_{algorithm}_focuspoints.npy", focus_points)
 
-    ani = animation.FuncAnimation(fig, update, frames=frames, init_func=init, repeat=True, interval=1 / FPS)
-    ani.save(f"../results/maps/{inputfile.stem}_{algorithm}_map.mp4", writer="ffmpeg", fps=FPS)
+    # ani = animation.FuncAnimation(fig, update, frames=frames, init_func=init, repeat=True, interval=1 / FPS)
+    # ani.save(f"../results/maps/{inputfile.stem}_{algorithm}_map.mp4", writer="ffmpeg", fps=FPS)
     plt.close()
     i = 0
 
 if __name__ == '__main__':
-    algorithms = ['BeamformerBase', 'BeamformerFunctional', 'BeamformerMusic', 'BeamformerCapon']
+    algorithms = [
+        'BeamformerBase',
+        'BeamformerFunctional',
+        'BeamformerMusic',
+        'BeamformerCapon'
+    ]
     recordings = [
         "../signal_audio/wall1.wav",
         "../signal_audio/wall2.wav",
