@@ -88,7 +88,7 @@ def run(algorithm='BeamformerBase', inputfile_path="../signal_audio/wall1.wav"):
     min_frame_time = 0
     max_frame_time = 0
 
-    fbf_gamma = 20
+    fbf_gamma = 200
 
     for block in gen:
         pt1 = time.thread_time()
@@ -171,7 +171,7 @@ def run(algorithm='BeamformerBase', inputfile_path="../signal_audio/wall1.wav"):
 
     i = 0
 
-    with open(Path("../results/bf_time") / "times.log", "w") as f:
+    with open(Path("../results/bf_time") / "times.log", "a") as f:
         f.write(f"{inputfile.stem},{algorithm},{pt},{t2 - t1},{total_frame_time},{avg_frame_time},{max_frame_time},{min_frame_time}\n")
     
     points = np.array([ p[1] for p in frames ])

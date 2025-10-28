@@ -13,7 +13,7 @@ scale = 550
 range_filter = True
 outlier_filter = True
 
-with open(Path("../results/dist/dist.log"), "w") as f:
+with open(Path("../results/dist/dist.log"), "a") as f:
     f.write("")
 
 def affine_transformation_matrix(src_points, dst_points):
