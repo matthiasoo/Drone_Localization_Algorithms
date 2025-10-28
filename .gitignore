@@ -3,7 +3,7 @@ __pycache__/
 
 signal_audio/*
 signal_video/*
-results/maps/*
+# results/maps/*
 
 !signal_audio/
 !signal_video/
