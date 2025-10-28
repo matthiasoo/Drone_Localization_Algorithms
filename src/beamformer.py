@@ -88,7 +88,7 @@ def run(algorithm='BeamformerBase', inputfile_path="../signal_audio/wall1.wav"):
     min_frame_time = 0
     max_frame_time = 0
 
-    fbf_gamma = 200
+    fbf_gamma = 50
 
     for block in gen:
         pt1 = time.thread_time()
@@ -180,8 +180,8 @@ def run(algorithm='BeamformerBase', inputfile_path="../signal_audio/wall1.wav"):
     np.save(f"../points_bf/{inputfile.stem}_{algorithm}_points.npy", points)
     np.save(f"../points_bf/{inputfile.stem}_{algorithm}_focuspoints.npy", focus_points)
 
-    # ani = animation.FuncAnimation(fig, update, frames=frames, init_func=init, repeat=True, interval=1 / FPS)
-    # ani.save(f"../results/maps/{inputfile.stem}_{algorithm}_map.mp4", writer="ffmpeg", fps=FPS)
+    ani = animation.FuncAnimation(fig, update, frames=frames, init_func=init, repeat=True, interval=1 / FPS)
+    ani.save(f"../results/maps/{inputfile.stem}_{algorithm}_map.mp4", writer="ffmpeg", fps=FPS)
     plt.close()
     i = 0
 
